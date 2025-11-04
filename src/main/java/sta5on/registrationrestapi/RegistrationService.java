@@ -59,4 +59,36 @@ public class RegistrationService {
         }
         userMap.remove(id);
     }
+
+    public User changeUsername(Long id, User usernameToChange) {
+        if (!userMap.containsKey(id)) {
+            throw new NoSuchElementException("Not found User with id: " + id);
+        }
+
+        var thisUser = userMap.get(id);
+        var updUser = new User(
+                thisUser.id(),
+                usernameToChange.username(),
+                thisUser.password(),
+                thisUser.regTime()
+        );
+                userMap.put(id, updUser);
+        return updUser;
+    }
+
+    public User changePassword(Long id, User passwordToChange) {
+        if (!userMap.containsKey(id)) {
+            throw new NoSuchElementException("Not found User with id: " + id);
+        }
+
+        var thisUser = userMap.get(id);
+        var updUser = new User(
+                thisUser.id(),
+                thisUser.username(),
+                passwordToChange.password(),
+                thisUser.regTime()
+        );
+        userMap.put(id, updUser);
+        return updUser;
+    }
 }

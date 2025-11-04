@@ -59,4 +59,25 @@ public class RegistrationController {
         }
     }
 
+    @PutMapping("/change/username/{id}")
+    public ResponseEntity<User> changeUsername(
+            @PathVariable("id") Long id,
+            @RequestBody User usernameToChange
+    ) {
+        log.info("Called method changeUsername, with User ID: " + id);
+        var updated = registrationService.changeUsername(id, usernameToChange);
+        return ResponseEntity.ok(updated);
+    }
+
+
+    @PutMapping("/change/password/{id}")
+    public ResponseEntity<User> changePassword(
+            @PathVariable("id") Long id,
+            @RequestBody User passwordToChange
+    ) {
+        log.info("Called method changePassword, with User ID: " + id);
+        var updated = registrationService.changePassword(id, passwordToChange);
+        return ResponseEntity.ok(updated);
+    }
+
 }
