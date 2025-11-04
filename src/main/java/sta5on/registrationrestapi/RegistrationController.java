@@ -3,11 +3,9 @@ package sta5on.registrationrestapi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -32,5 +30,33 @@ public class RegistrationController {
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(404).build();
         }
-     }
+    }
+
+    @GetMapping
+    public List<User> getAllUsers() {
+        log.info("Called method getAllUsers");
+        return registrationService.getAllUsers();
+    }
+
+    @PostMapping
+    public User createUser(
+            @RequestBody User userToCreate
+    ) {
+        log.info("Called method createUser");
+        return registrationService.createUser(userToCreate);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable("id") Long id
+    ) {
+        log.info("Called method deleteUser, id: " + id);
+        try {
+            registrationService.deleteUser(id);
+            return ResponseEntity.ok().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(404).build();
+        }
+    }
+
 }

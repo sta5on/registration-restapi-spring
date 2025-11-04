@@ -1,8 +1,11 @@
 package sta5on.registrationrestapi;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -19,6 +22,13 @@ public class RegistrationService {
         idCounter = new AtomicLong();
     }
 
+    public List<User> getAllUsers() {
+        if (userMap.isEmpty()) {
+            throw new NoSuchElementException("Users list is empty");
+        }
+        return userMap.values().stream().toList();
+    }
+
     public User getUserByID(
             Long id
     ) {
@@ -27,5 +37,26 @@ public class RegistrationService {
         } else {
             return userMap.get(id);
         }
+    }
+
+    public User createUser(User userToCreate) {
+        if (userToCreate.id() != null) {
+            throw new IllegalArgumentException("User id must be empty");
+        }
+        var newUser = new User(
+                idCounter.incrementAndGet(),
+                userToCreate.username(),
+                userToCreate.password(),
+                LocalDate.now()
+        );
+        userMap.put(newUser.id(), newUser);
+        return newUser;
+    }
+
+    public void deleteUser(Long id) {
+        if (!userMap.containsKey(id)) {
+            throw new NoSuchElementException("Not found user with id: " + id);
+        }
+        userMap.remove(id);
     }
 }
