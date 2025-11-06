@@ -49,6 +49,12 @@ public class RegistrationService {
                 userToCreate.password(),
                 LocalDate.now()
         );
+        var isConflict = isUserConflict(newUser);
+
+        if (isConflict) {
+            throw new IllegalStateException("Cannot create new user, username is taken");
+        }
+
         userMap.put(newUser.id(), newUser);
         return newUser;
     }
@@ -72,7 +78,14 @@ public class RegistrationService {
                 thisUser.password(),
                 thisUser.regTime()
         );
-                userMap.put(id, updUser);
+
+        var isConflict = isUserConflict(updUser);
+
+        if (isConflict) {
+            throw new IllegalStateException("Cannot create new user, username is taken");
+        }
+
+        userMap.put(id, updUser);
         return updUser;
     }
 
@@ -90,5 +103,14 @@ public class RegistrationService {
         );
         userMap.put(id, updUser);
         return updUser;
+    }
+
+    private boolean isUserConflict(User user) {
+        for (User existingUser : userMap.values()) {
+            if (user.username().equals(existingUser.username())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
