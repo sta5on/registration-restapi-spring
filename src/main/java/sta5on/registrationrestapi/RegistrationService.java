@@ -40,6 +40,14 @@ public class RegistrationService {
         return toDomainUser(userEntity);
     }
 
+
+    public User getUserByUsername(String username) {
+        var userEntity = repository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("Not found user with id = " + username));
+
+        return userEntity;
+    }
+
     public User createUser(User userToCreate) {
         if (userToCreate.id() != null) {
             throw new IllegalArgumentException("User id must be empty");

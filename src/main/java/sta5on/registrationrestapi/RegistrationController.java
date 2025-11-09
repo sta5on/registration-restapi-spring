@@ -38,6 +38,19 @@ public class RegistrationController {
         return registrationService.getAllUsers();
     }
 
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity<User> getUserByUsername(
+            @PathVariable("username") String username
+    ) {
+        log.info("Called methos getUserByUsername, with username = {}", username);
+        try {
+            return ResponseEntity.ok().body(registrationService.getUserByUsername(username));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(404).build();
+        }
+    }
+
     @PostMapping
     public User createUser(
             @RequestBody User userToCreate
@@ -79,5 +92,4 @@ public class RegistrationController {
         var updated = registrationService.changePassword(id, passwordToChange);
         return ResponseEntity.ok(updated);
     }
-
 }
