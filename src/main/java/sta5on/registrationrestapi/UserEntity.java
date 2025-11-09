@@ -19,15 +19,39 @@ public class UserEntity {
     String password;
     @Column(name = "regDateTime")
     LocalDateTime regDateTime;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    UserRole role;
 
     public UserEntity() {
     }
 
-    public UserEntity(Long id, String username, String password, LocalDateTime regDateTime) {
-        this.regDateTime = regDateTime;
+    public UserEntity(Long id, String username, String password, LocalDateTime regDateTime, UserRole role) {
+        this.id = id;
         this.username = username;
         this.password = password;
-        this.id = id;
+        this.regDateTime = regDateTime;
+        this.role = role;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public LocalDateTime getRegDateTime() {
+        return regDateTime;
+    }
+
+    public UserRole getRole() {
+        return role;
     }
 
     public void setId(Long id) {
@@ -46,19 +70,7 @@ public class UserEntity {
         this.regDateTime = regDateTime;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public LocalDateTime getRegDateTime() {
-        return regDateTime;
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 }

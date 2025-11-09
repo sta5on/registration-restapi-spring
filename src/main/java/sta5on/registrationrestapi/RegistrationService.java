@@ -19,31 +19,25 @@ public class RegistrationService {
 
     private RegistrationRepository repository;
 
-    private final Map<Long, User> userMap;
-
-    private final AtomicLong idCounter;
-
     public RegistrationService(RegistrationRepository repository) {
         this.repository = repository;
-        userMap = new HashMap<>();
-        idCounter = new AtomicLong();
     }
 
     public List<User> getAllUsers() {
-        if (userMap.isEmpty()) {
-            throw new NoSuchElementException("Users list is empty");
-        }
-        return userMap.values().stream().toList();
+        List<UserEntity> allEntities = repository.findAll();
+
+        List<User> allUsers = allEntities.stream().map(this::toDomainUser).toList();
+
+        return allUsers;
     }
 
     public User getUserByID(
             Long id
     ) {
-        if (!userMap.containsKey(id)) {
-            throw new NoSuchElementException("Not found reservation with id = " + id);
-        } else {
-            return userMap.get(id);
-        }
+        var userEntity = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Not found user with id = " + id));
+
+        return toDomainUser(userEntity);
     }
 
     public User createUser(User userToCreate) {
@@ -54,7 +48,8 @@ public class RegistrationService {
                 null,
                 userToCreate.username(),
                 userToCreate.password(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                UserRole.DEFAULT
         );
         var isConflict = isUserConflict(newUser);
 
@@ -69,49 +64,48 @@ public class RegistrationService {
     }
 
     public void deleteUser(Long id) {
-        if (!userMap.containsKey(id)) {
-            throw new NoSuchElementException("Not found user with id: " + id);
-        }
-        userMap.remove(id);
+        var userEntity = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Not found user with id = " + id));
+
+        repository.setRole(id, UserRole.DELETED);
     }
 
-//    public User changeUsername(Long id, User usernameToChange) {
-//        if (!userMap.containsKey(id)) {
-//            throw new NoSuchElementException("Not found User with id: " + id);
-//        }
-//
-//        var thisUser = userMap.get(id);
-//        var updUser = new UserEntity(
-//                thisUser.id(),
-//                usernameToChange.username(),
-//                thisUser.password(),
-//                thisUser.regDateTime()
-//        );
-//
-//        var isConflict = isUserConflict(updUser);
-//
-//        if (isConflict) {
-//            throw new IllegalStateException("Cannot create new user, username is taken");
-//        }
-//
-//        userMap.put(id, updUser);
-//        return updUser;
-//    }
+    public User changeUsername(Long id, User usernameToChange) {
+        var userEntity = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Not found user with id = " + id));
 
-    public User changePassword(Long id, User passwordToChange) {
-        if (!userMap.containsKey(id)) {
-            throw new NoSuchElementException("Not found User with id: " + id);
+        var updUser = new UserEntity(
+                userEntity.getId(),
+                usernameToChange.username(),
+                userEntity.getPassword(),
+                userEntity.getRegDateTime(),
+                userEntity.getRole()
+        );
+
+        var isConflict = isUserConflict(updUser);
+
+        if (isConflict) {
+            throw new IllegalStateException("Cannot create new user, username is taken");
         }
 
-        var thisUser = userMap.get(id);
-        var updUser = new User(
-                thisUser.id(),
-                thisUser.username(),
+        var updatedUser = repository.save(updUser);
+        return toDomainUser(updatedUser);
+    }
+
+    public User changePassword(Long id, User passwordToChange) {
+        var userEntity = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Not found user with id = " + id));
+
+        var updUser = new UserEntity(
+                userEntity.getId(),
+                userEntity.getUsername(),
                 passwordToChange.password(),
-                thisUser.regDateTime()
+                userEntity.getRegDateTime(),
+                userEntity.getRole()
         );
-        userMap.put(id, updUser);
-        return updUser;
+
+        var savedUser = repository.save(updUser);
+        return toDomainUser(savedUser);
     }
 
     private boolean isUserConflict(UserEntity user) {
@@ -129,7 +123,8 @@ public class RegistrationService {
                 entity.getId(),
                 entity.getUsername(),
                 entity.getPassword(),
-                entity.getRegDateTime()
+                entity.getRegDateTime(),
+                entity.getRole()
         );
     }
 }

@@ -24,7 +24,7 @@ public class RegistrationController {
     public ResponseEntity<User> getUserByID(
             @PathVariable("id") Long id
     ) {
-        log.info("Called method getUserByID, id: " + id);
+        log.info("Called method getUserByID, id: {}", id);
         try {
             return ResponseEntity.ok().body(registrationService.getUserByID(id));
         } catch (NoSuchElementException e) {
@@ -46,11 +46,11 @@ public class RegistrationController {
         return registrationService.createUser(userToCreate);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(
             @PathVariable("id") Long id
     ) {
-        log.info("Called method deleteUser, id: " + id);
+        log.info("Called method deleteUser, id: {}", id);
         try {
             registrationService.deleteUser(id);
             return ResponseEntity.ok().build();
@@ -58,16 +58,16 @@ public class RegistrationController {
             return ResponseEntity.status(404).build();
         }
     }
-//
-//    @PutMapping("/change/username/{id}")
-//    public ResponseEntity<User> changeUsername(
-//            @PathVariable("id") Long id,
-//            @RequestBody User usernameToChange
-//    ) {
-//        log.info("Called method changeUsername, with User ID: " + id);
-//        var updated = registrationService.changeUsername(id, usernameToChange);
-//        return ResponseEntity.ok(updated);
-//    }
+
+    @PutMapping("/change/username/{id}")
+    public ResponseEntity<User> changeUsername(
+            @PathVariable("id") Long id,
+            @RequestBody User usernameToChange
+    ) {
+        log.info("Called method changeUsername, with User ID: {}", id);
+        var updated = registrationService.changeUsername(id, usernameToChange);
+        return ResponseEntity.ok(updated);
+    }
 
 
     @PutMapping("/change/password/{id}")
@@ -75,7 +75,7 @@ public class RegistrationController {
             @PathVariable("id") Long id,
             @RequestBody User passwordToChange
     ) {
-        log.info("Called method changePassword, with User ID: " + id);
+        log.info("Called method changePassword, with User ID: {}", id);
         var updated = registrationService.changePassword(id, passwordToChange);
         return ResponseEntity.ok(updated);
     }
