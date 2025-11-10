@@ -75,6 +75,14 @@ public class RegistrationService {
         var userEntity = repository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Not found user with id = " + id));
 
+        if (userEntity.getRole() == UserRole.DELETED) {
+            throw new IllegalStateException("This user is already deleted, id:" + id);
+        }
+
+        if (userEntity.getRole() == UserRole.ADMIN) {
+            throw new IllegalStateException("You cannot delete user with Admin role, id: " + id);
+        }
+
         repository.setRole(id, UserRole.DELETED);
     }
 
@@ -114,6 +122,33 @@ public class RegistrationService {
 
         var savedUser = repository.save(updUser);
         return toDomainUser(savedUser);
+    }
+
+
+    public User changeRole(Long id, String role, String isAdmin) {
+        var userEntity = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Not found user with id = " + id));
+
+//        role = role.toLowerCase();
+
+        String normalizedRole = role == null ? "" : role.toLowerCase();
+
+        if (normalizedRole.equals("admin") || normalizedRole.equals("default")) {
+            switch (normalizedRole) {
+                case "default":
+                    repository.setRole(id, UserRole.DEFAULT);
+                    break;
+                case "admin":
+                    repository.setRole(id, UserRole.ADMIN);
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            throw new IllegalArgumentException("Not found your role: " + normalizedRole);
+        }
+
+        return toDomainUser(userEntity);
     }
 
     private boolean isUserConflict(UserEntity user) {
