@@ -1,5 +1,6 @@
 package sta5on.registrationrestapi;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +26,7 @@ public class RegistrationController {
             @PathVariable("id") Long id
     ) {
         log.info("Called method getUserByID, id: {}", id);
-        try {
-            return ResponseEntity.ok().body(registrationService.getUserByID(id));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(404).build();
-        }
+        return ResponseEntity.ok().body(registrationService.getUserByID(id));
     }
 
     @GetMapping
@@ -44,16 +41,12 @@ public class RegistrationController {
             @PathVariable("username") String username
     ) {
         log.info("Called methos getUserByUsername, with username = {}", username);
-        try {
-            return ResponseEntity.ok().body(registrationService.getUserByUsername(username));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(404).build();
-        }
+        return ResponseEntity.ok().body(registrationService.getUserByUsername(username));
     }
 
     @PostMapping
     public User createUser(
-            @RequestBody User userToCreate
+            @RequestBody @Valid User userToCreate
     ) {
         log.info("Called method createUser");
         return registrationService.createUser(userToCreate);
@@ -64,18 +57,14 @@ public class RegistrationController {
             @PathVariable("id") Long id
     ) {
         log.info("Called method deleteUser, id: {}", id);
-        try {
-            registrationService.deleteUser(id);
-            return ResponseEntity.ok().build();
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(404).build();
-        }
+        registrationService.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/change/username/{id}")
     public ResponseEntity<User> changeUsername(
             @PathVariable("id") Long id,
-            @RequestBody User usernameToChange
+            @RequestBody @Valid User usernameToChange
     ) {
         log.info("Called method changeUsername, with User ID: {}", id);
         var updated = registrationService.changeUsername(id, usernameToChange);
@@ -97,7 +86,7 @@ public class RegistrationController {
     @PutMapping("/change/password/{id}")
     public ResponseEntity<User> changePassword(
             @PathVariable("id") Long id,
-            @RequestBody User passwordToChange
+            @RequestBody @Valid User passwordToChange
     ) {
         log.info("Called method changePassword, with User ID: {}", id);
         var updated = registrationService.changePassword(id, passwordToChange);
