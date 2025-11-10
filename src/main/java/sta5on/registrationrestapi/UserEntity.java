@@ -13,6 +13,8 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @Column(name = "email", nullable = false)
+    String email;
     @Column(name = "username", nullable = false)
     String username;
     @Column(name = "password", nullable = false)
@@ -23,39 +25,21 @@ public class UserEntity {
     @Column(name = "role")
     UserRole role;
 
-    public UserEntity() {
-    }
-
-    public UserEntity(Long id, String username, String password, LocalDateTime regDateTime, UserRole role) {
+    public UserEntity(Long id, String email, String username, String password, LocalDateTime regDateTime, UserRole role) {
         this.id = id;
+        this.email = email;
         this.username = username;
         this.password = password;
         this.regDateTime = regDateTime;
         this.role = role;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public LocalDateTime getRegDateTime() {
-        return regDateTime;
-    }
-
-    public UserRole getRole() {
-        return role;
-    }
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setUsername(String username) {
@@ -72,5 +56,32 @@ public class UserEntity {
 
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public UserEntity() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public LocalDateTime getRegDateTime() {
+        return regDateTime;
+    }
+
+    public UserRole getRole() {
+        return role;
     }
 }

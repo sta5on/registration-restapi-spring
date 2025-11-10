@@ -71,6 +71,16 @@ public class RegistrationController {
         return ResponseEntity.ok(updated);
     }
 
+    @PutMapping("/change/email/{id}")
+    public ResponseEntity<User> changeEmail(
+            @PathVariable("id") Long id,
+            @RequestBody @Valid User emailToChange
+    ) {
+        log.info("Called method changeEmail, with User ID: {}", id);
+        var updated = registrationService.changeEmail(id, emailToChange);
+        return ResponseEntity.ok(updated);
+    }
+
     @PutMapping("/change/role/{id}/{role}")
     public ResponseEntity<User> changeRole(
             @PathVariable("id") Long id,

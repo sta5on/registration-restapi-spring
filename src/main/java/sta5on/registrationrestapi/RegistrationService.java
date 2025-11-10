@@ -2,15 +2,11 @@ package sta5on.registrationrestapi;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class RegistrationService {
@@ -54,6 +50,7 @@ public class RegistrationService {
         }
         var newUser = new UserEntity(
                 null,
+                userToCreate.email(),
                 userToCreate.username(),
                 userToCreate.password(),
                 LocalDateTime.now(),
@@ -92,6 +89,7 @@ public class RegistrationService {
 
         var updUser = new UserEntity(
                 userEntity.getId(),
+                userEntity.getEmail(),
                 usernameToChange.username(),
                 userEntity.getPassword(),
                 userEntity.getRegDateTime(),
@@ -108,12 +106,37 @@ public class RegistrationService {
         return toDomainUser(updatedUser);
     }
 
+
+    public User changeEmail(Long id, User emailToChange) {
+        var userEntity = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Not found user with id = " + id));
+
+        var updUser = new UserEntity(
+                userEntity.getId(),
+                emailToChange.email(),
+                userEntity.getUsername(),
+                userEntity.getPassword(),
+                userEntity.getRegDateTime(),
+                userEntity.getRole()
+        );
+
+        var isConflict = isEmailConflict(updUser);
+
+        if (isConflict) {
+            throw new IllegalStateException("Cannot create new user, email is taken");
+        }
+
+        var updatedUser = repository.save(updUser);
+        return toDomainUser(updatedUser);
+    }
+
     public User changePassword(Long id, User passwordToChange) {
         var userEntity = repository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Not found user with id = " + id));
 
         var updUser = new UserEntity(
                 userEntity.getId(),
+                userEntity.getEmail(),
                 userEntity.getUsername(),
                 passwordToChange.password(),
                 userEntity.getRegDateTime(),
@@ -161,9 +184,20 @@ public class RegistrationService {
         return false;
     }
 
+    private boolean isEmailConflict(UserEntity user) {
+        var allUsers = repository.findAll();
+        for (UserEntity existingUser : allUsers) {
+            if (user.getEmail().equals(existingUser.getEmail())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private User toDomainUser(UserEntity entity) {
         return new User(
                 entity.getId(),
+                entity.getEmail(),
                 entity.getUsername(),
                 entity.getPassword(),
                 entity.getRegDateTime(),
